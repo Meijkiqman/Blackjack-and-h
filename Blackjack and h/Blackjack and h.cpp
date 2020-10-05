@@ -2,20 +2,60 @@
 #include<vector>
 #include<ctime>
 #include<conio.h>
+#include<chrono>
+#include <windows.h>
 
 
-std::vector <int> card = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }; // vector assigns card values
 
+
+int card;
 int playerCash = 100;
 int houseCash = 100;
 int houseCardsValue = 0;
 int cardsValue = 0;
 int pool = 0;
 
+void startBet();
+void houseDraw();
 
 void playerLose()
+{	
+	if (cardsValue > 21)
+	{
+		std::cout << "Your card value exceeded 21, you lose this round :("	"\n";
+		houseCash = houseCash + pool;
+		startBet();
+	}
+	else if (cardsValue < houseCardsValue)
+	{
+		std::cout << "the house got closer to 21 than you, the house wins" "\n";
+		houseCash = houseCash + pool;
+		startBet();
+	}
+}
+
+void houseLose()
 {
-	std::cout << "Your card value exceeded 21, you lose this round :("	"\n";
+	if (houseCardsValue > 21)
+	{
+		std::cout << "the house exceeded 21, you win" "\n";
+		playerCash = playerCash + pool;
+		startBet();
+	}
+	else if (houseCardsValue < cardsValue)
+	{
+		std::cout << "you got closer to 21 than the house, you win" "\n";
+		playerCash = playerCash + pool;
+		startBet();
+	}
+	
+}
+
+void tie()
+{
+	std::cout << "your card values and the houses' are the same, it's a tie." "\n";
+	pool = pool / 2;
+	playerCash = playerCash + pool;
 	houseCash = houseCash + pool;
 	startBet();
 }
@@ -26,14 +66,11 @@ void draw()
 
 	while (true)
 	{
-		std::cout << "please draw a card from 1 to 10" "\n";
-		int choice;									//which card you decide to draw (this is pretty redundant since its not an actuall deck of cards)
-		int drawnCard;								//value of what card was drawn
-
-		std::cin >> choice;
+		std::cout << "Press any key to draw a card." "\n";
+		_getch();
+		int drawnCard;								
 		srand(time(0));
-		drawnCard = rand() % card.size();
-		card.push_back(drawnCard);								// randomly selects a card from the vector
+		drawnCard = rand() % 10 + 1;								
 		std::cout << "you drew a " << drawnCard << "\n";
 		if (drawnCard == 1)
 		{
@@ -61,7 +98,7 @@ void draw()
 			}
 		}
 		else(drawnCard != 1);
-		card.push_back(drawnCard);
+		
 
 		cardsValue = drawnCard + cardsValue;		// adds together total  value of your cards
 		std::cout << "Your total value of cards are now: " << cardsValue << "\n";
@@ -83,7 +120,7 @@ void draw()
 	else if (cardsValue <= 21)
 	{
 		std::cout << "you have a card value of " << cardsValue << "\n";
-		std::cout << "would you like to bet additional money on your cards? y/n";
+		std::cout << "would you like to bet additional money on your cards? y/n" "\n";
 		char ans;
 		std::cin >> ans;
 		if (ans == 'y')
@@ -100,12 +137,12 @@ void draw()
 				}
 				else if (bet < playerCash && bet < houseCash)
 				{
-					playerCash - bet;
+					playerCash -= bet;
 					pool = bet + pool;
 					std::cout << "the house matches your bet" "\n";
-					houseCash - bet;
+					houseCash -= bet;
 					pool = bet + pool;
-					std::cout << "the pool has now a value of" << pool << "$" "\n";
+					std::cout << "the pool has now a value of " << pool << "$" "\n";
 
 					break;
 				}
@@ -114,7 +151,7 @@ void draw()
 
 		}
 
-		std::cout << "house will now draw";
+		std::cout << "house will now draw " "\n";
 		houseDraw();
 
 	}
@@ -123,21 +160,20 @@ void draw()
 
 void startBet()
 {
-	pool = 0;				//resets all relevant values.
+	pool = 0;													//resets all relevant values.
 	houseCardsValue = 0;
 	cardsValue = 0;
 	std::cout << "your balance is " << playerCash << "$" "\n";
 	std::cout << "the houses balance is " << houseCash << "$" "\n";
 	std::cout << "the the starting bid is 10$, press any key to confirm your bet" "\n";
-	char any;
-	std::cin >> any;
+	_getch();
 	if (playerCash >= 10 && houseCash >= 10)
 	{
-		playerCash - 10;
-		pool + 10;
-		houseCash - 10;
-		pool + 10;
-		std::cout << "the pool is now worth" << pool << "$, time to draw your cards!" "\n";
+		playerCash -= 10;
+		pool += 10;
+		houseCash -= 10;
+		pool += 10;
+		std::cout << "the pool is now worth " << pool << "$, time to draw your cards!" "\n";
 
 		draw();
 	}
@@ -157,12 +193,13 @@ void setUp()
 	std::cout << "welcome to blackjack you and the house has a total of $100 to play for, each round has a starting bid of $10" "\n";
 	std::cout << "you will then be asked to draw a card from a deck ranging from 1 to 10, to goal is to come as close to 21 has possible. if you exceed 21 you lose." << "\n";
 	std::cout << "you are allowed to draw has many cards as you want. after you are satisfied with your cards you can bet again on your cards, the house will match your bid. so you cannot bet more then the house" "\n";
-	std::cout << "whoever has all of the opponents moey at the end wins!" "\n" << "press any key to continue";
-	char any;
-	std::cin >> any;
+	std::cout << "whoever has all of the opponents moey at the end wins!" "\n" << "press any key to continue" "\n";
+	_getch();
 
 	startBet();
 }
+
+
 
 void playerWin()
 {
@@ -177,9 +214,10 @@ void houseDraw()
 
 	do
 	{
+		Sleep(1000);
 		srand(time(0));
-		houseCard = rand() % card.size();
-		card.push_back(houseCard);
+		houseCard = rand() % 10 + 1;
+
 		std::cout << "the House drew a " << houseCard << "\n";
 		if (houseCard == 1)
 		{
@@ -195,7 +233,27 @@ void houseDraw()
 				houseCard = 11;
 			}
 		}
+		
+		houseCardsValue = houseCard + houseCardsValue;
+
 	} while (houseCardsValue < cardsValue);
+	std::cout << "the house has a card value of " << houseCardsValue << "\n";
+	if (houseCardsValue > 21)
+	{
+		houseLose();
+	}
+	else if (houseCardsValue < cardsValue)
+	{
+		houseLose();
+	}
+	else if (houseCardsValue > cardsValue)
+	{
+		playerLose();
+	}
+	else if (houseCardsValue == cardsValue)
+	{
+		tie();
+	}
 }
 
 
